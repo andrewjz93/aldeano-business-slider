@@ -1,0 +1,67 @@
+[
+  {
+    "id": 1,
+    "nombre": "Tecnova",
+    "categoria": "Tecnología",
+    "ciudad": "Paraná",
+    "imagen": "https://picsum.photos/id/180/500/500",
+    "logo": "https://picsum.photos/id/1/100/100",
+    "actividad": "Activa ahora",
+    "badge": "ACTIVA",
+    "badgeTipo": "activa",
+    "premium": true,
+    "url": "#"
+  },
+  {
+    "id": 2,
+    "nombre": "Agro Sur",
+    "categoria": "Agroindustria",
+    "ciudad": "Rosario",
+    "imagen": "https://picsum.photos/id/102/500/500",
+    "logo": "https://picsum.photos/id/1025/100/100",
+    "actividad": "Nuevo video",
+    "badge": "VIDEO",
+    "badgeTipo": "video",
+    "premium": false,
+    "url": "#"
+  },
+  {
+    "id": 3,
+    "nombre": "Fercam",
+    "categoria": "Logística",
+    "ciudad": "Córdoba",
+    "imagen": "https://picsum.photos/id/1074/500/500",
+    "logo": "https://picsum.photos/id/1070/100/100",
+    "actividad": "Nueva promoción",
+    "badge": "PROMO",
+    "badgeTipo": "promo",
+    "premium": true,
+    "url": "#"
+  },
+  {
+    "id": 4,
+    "nombre": "Ferretería Central",
+    "categoria": "Ferretería",
+    "ciudad": "Santa Fe",
+    "imagen": "https://picsum.photos/id/1060/500/500",
+    "logo": "https://picsum.photos/id/1062/100/100",
+    "actividad": "Empresa destacada",
+    "badge": "DESTACADA",
+    "badgeTipo": "destacada",
+    "premium": false,
+    "url": "#"
+  },
+  {
+    "id": 5,
+    "nombre": "Servicios del Sur",
+    "categoria": "Servicios profesionales",
+    "ciudad": "Mendoza",
+    "imagen": "https://picsum.photos/id/1040/500/500",
+    "logo": "https://picsum.photos/id/1005/100/100",
+    "actividad": "Nueva empresa",
+    "badge": "NUEVA",
+    "badgeTipo": "nueva",
+    "premium": false,
+    "url": "#"
+  }
+]

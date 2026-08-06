@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Slider Empresas - El Aldeano</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <section class="business-slider">
+        <div class="slider-header">
+            <div>
+                <span class="slider-eyebrow">
+                    EL ALDEANO
+                </span>
+                <h2>
+                    Empresas destacadas
+                </h2>
+            </div>
+            <a
+                href="#"
+                class="view-all"
+            >
+                Ver todas
+            </a>
+        </div>
+
+        <!-- ESTE ES EL CONTENEDOR QUE SE MUEVE -->
+
+        <div
+            class="slider-viewport"
+            id="sliderViewport"
+        >
+            <div
+                class="slider-track"
+                id="sliderTrack"
+            >
+                <div class="loading">
+                    Cargando empresas...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script
+        type="module"
+        src="slider.js">
+    </script>
+</body>
+
+</html>

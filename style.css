@@ -1,0 +1,301 @@
+/* ===========================
+   EL ALDEANO BUSINESS SLIDER
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Poppins,Arial,sans-serif;
+}
+
+:root{
+
+    --principal:#4743c5;
+
+    --cardWidth:130px;
+    --cardHeight:215px;
+
+    --gap:12px;
+
+}
+
+body{
+
+    background:#eef6f8;
+
+}
+
+.business-slider{
+
+    width:100%;
+
+    overflow:hidden;
+
+    padding:15px 0;
+
+}
+
+.slider-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:12px;
+
+    padding:0 12px;
+
+}
+
+.slider-header h2{
+
+    font-size:22px;
+
+    color:#222;
+
+}
+
+.slider-header a{
+
+    color:var(--principal);
+
+    text-decoration:none;
+
+    font-weight:600;
+
+}
+
+.slider-viewport{
+
+    overflow:hidden;
+
+}
+
+.slider-track{
+
+    display:flex;
+
+    gap:var(--gap);
+
+    width:max-content;
+
+}
+
+.company-card{
+
+    width:var(--cardWidth);
+
+    height:var(--cardHeight);
+
+    background:white;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    text-decoration:none;
+
+    color:#222;
+
+    position:relative;
+
+    flex-shrink:0;
+
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+
+    transition:.30s;
+
+}
+
+.company-card:hover{
+
+    transform:translateY(-5px) scale(1.03);
+
+    box-shadow:0 12px 30px rgba(0,0,0,.18);
+
+}
+
+.card-image-wrapper{
+
+    position:relative;
+
+    width:100%;
+
+    height:110px;
+
+    overflow:hidden;
+
+}
+
+.card-image{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    transition:.40s;
+
+}
+
+.company-card:hover .card-image{
+
+    transform:scale(1.08);
+
+}
+
+.company-logo{
+
+    position:absolute;
+
+    top:8px;
+
+    left:8px;
+
+    width:36px;
+
+    height:36px;
+
+    border-radius:50%;
+
+    border:2px solid white;
+
+    object-fit:cover;
+
+    background:white;
+
+    z-index:20;
+
+    box-shadow:0 3px 10px rgba(0,0,0,.25);
+
+}
+
+.company-badge{
+
+    position:absolute;
+
+    top:8px;
+
+    right:8px;
+
+    background:var(--principal);
+
+    color:white;
+
+    padding:4px 7px;
+
+    border-radius:20px;
+
+    font-size:8px;
+
+    font-weight:bold;
+
+}
+
+.badge-video{
+
+    background:#d32f2f;
+
+}
+
+.badge-promo{
+
+    background:#ff9800;
+
+}
+
+.badge-activa{
+
+    background:#2e7d32;
+
+}
+
+.badge-nueva{
+
+    background:#1976d2;
+
+}
+
+.badge-destacada{
+
+    background:#7b1fa2;
+
+}
+
+.premium-star{
+
+    position:absolute;
+
+    top:8px;
+
+    left:8px;
+
+    width:22px;
+
+    height:22px;
+
+    border-radius:50%;
+
+    background:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:12px;
+
+}
+
+.card-content{
+
+    padding:10px 10px 8px;
+
+}
+
+.company-name{
+
+    font-size:13px;
+
+    font-weight:700;
+
+    line-height:1.2;
+
+    margin-bottom:3px;
+
+}
+
+.company-category{
+
+    font-size:10px;
+
+    color:#666;
+
+    margin-bottom:6px;
+
+}
+
+.company-location{
+
+    font-size:9px;
+
+    color:#666;
+
+    margin-bottom:4px;
+
+}
+
+.company-activity{
+
+    font-size:9px;
+
+    color:var(--principal);
+
+    font-weight:600;
+
+}

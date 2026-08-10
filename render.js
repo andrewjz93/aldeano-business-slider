@@ -17,18 +17,36 @@ export function createCompanyCard(company) {
     `
     : "";
 
+  const activityType =
+    company.origen ||
+    company.badgeTipo ||
+    "empresa";
+
   const badgeType = sanitizeClassName(
-    company.badgeTipo || "empresa"
+    normalizeBadgeType(activityType)
   );
 
   const activityIcon = getActivityIcon(
-    company.badgeTipo
+    activityType
   );
+
+  const activityText = getActivityText(
+    company
+  );
+
+  const badgeText = getBadgeText(
+    company
+  );
+
+  const cardUrl =
+    company.url ||
+    company.sitio_web ||
+    "#";
 
   return `
     <a
       class="company-card"
-      href="${escapeAttribute(company.url || "#")}"
+      href="${escapeAttribute(cardUrl)}"
       target="_top"
       rel="noopener noreferrer"
       aria-label="Ver empresa ${escapeAttribute(company.nombre)}"
@@ -48,12 +66,14 @@ export function createCompanyCard(company) {
         <span
           class="company-badge badge-${badgeType}"
         >
-          ${escapeHtml(company.badge || "EMPRESA")}
+          ${escapeHtml(badgeText)}
         </span>
 
         <img
           class="company-logo"
-          src="${escapeAttribute(company.logo || company.imagen)}"
+          src="${escapeAttribute(
+            company.logo || company.imagen
+          )}"
           alt="Logo de ${escapeAttribute(company.nombre)}"
           loading="lazy"
         >
@@ -65,14 +85,18 @@ export function createCompanyCard(company) {
         </h3>
 
         <p class="company-category">
-          ${escapeHtml(company.categoria || "Empresa")}
+          ${escapeHtml(
+            company.categoria || "Empresa"
+          )}
         </p>
 
         <p class="company-location">
           <span aria-hidden="true">📍</span>
 
           <span>
-            ${escapeHtml(company.ciudad || "Argentina")}
+            ${escapeHtml(
+              company.ciudad || "Argentina"
+            )}
           </span>
         </p>
 
@@ -82,9 +106,7 @@ export function createCompanyCard(company) {
           </span>
 
           <span>
-            ${escapeHtml(
-              company.actividad || "Empresa destacada"
-            )}
+            ${escapeHtml(activityText)}
           </span>
         </p>
       </div>
@@ -100,16 +122,103 @@ export function showError(track, message) {
   `;
 }
 
+function getActivityText(company) {
+  if (company.titulo) {
+    return company.titulo;
+  }
+
+  if (company.actividad) {
+    return company.actividad;
+  }
+
+  if (company.premium) {
+    return "Empresa Premium";
+  }
+
+  if (company.destacada) {
+    return "Empresa destacada";
+  }
+
+  return "Empresa en El Aldeano";
+}
+
+function getBadgeText(company) {
+  const origin = String(
+    company.origen || ""
+  ).toLowerCase();
+
+  if (origin === "youtube") {
+    return "VIDEO";
+  }
+
+  if (
+    origin === "wix_group" ||
+    origin === "wixgroups"
+  ) {
+    return "NUEVO POST";
+  }
+
+  if (origin === "rss") {
+    return "NOVEDAD";
+  }
+
+  if (company.premium) {
+    return "PREMIUM";
+  }
+
+  if (company.destacada) {
+    return "DESTACADA";
+  }
+
+  return company.badge || "EMPRESA";
+}
+
 function getActivityIcon(type) {
+  const normalized =
+    String(type || "").toLowerCase();
+
   const icons = {
-    activa: "🟢",
+    youtube: "🎥",
     video: "🎥",
+
+    wix_group: "📰",
+    wixgroups: "📰",
+
+    rss: "📰",
+
+    activa: "🟢",
     promo: "🎁",
+    promocion: "🎁",
     destacada: "⭐",
-    nueva: "🆕"
+    nueva: "🆕",
+    empresa: "🏢"
   };
 
-  return icons[type] || "🏢";
+  return icons[normalized] || "🏢";
+}
+
+function normalizeBadgeType(type) {
+  const normalized =
+    String(type || "").toLowerCase();
+
+  const mapping = {
+    youtube: "video",
+    video: "video",
+
+    wix_group: "destacada",
+    wixgroups: "destacada",
+
+    rss: "nueva",
+
+    promocion: "promo",
+    promo: "promo",
+
+    activa: "activa",
+    destacada: "destacada",
+    nueva: "nueva"
+  };
+
+  return mapping[normalized] || "activa";
 }
 
 function sanitizeClassName(value) {

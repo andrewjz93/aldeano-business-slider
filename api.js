@@ -32,6 +32,10 @@ export async function loadCompanies() {
 }
 
 function normalizeCompany(company) {
+  const hasActivity =
+    Boolean(company.origen) ||
+    Boolean(company.titulo);
+
   return {
     id: company.id,
 
@@ -44,43 +48,132 @@ function normalizeCompany(company) {
     ciudad:
       company.ciudad || "Argentina",
 
+    provincia:
+      company.provincia || "",
+
     imagen:
+      company.actividad_imagen ||
       company.imagen ||
       "https://picsum.photos/500/500",
 
     logo:
       company.logo ||
       company.imagen ||
+      company.actividad_imagen ||
       "https://picsum.photos/100/100",
 
+    // =========================
+    // ACTIVIDAD RECIENTE
+    // =========================
+
+    origen:
+      company.origen || "",
+
+    titulo:
+      company.titulo || "",
+
+    actividadUrl:
+      company.actividad_url || "",
+
+    actividadImagen:
+      company.actividad_imagen || "",
+
+    fechaPublicacion:
+      company.fecha_publicacion || "",
+
     actividad:
-      company.premium
-        ? "Empresa Premium"
-        : company.destacada
-          ? "Empresa destacada"
-          : "Empresa en El Aldeano",
+      hasActivity
+        ? company.titulo
+        : company.premium
+          ? "Empresa Premium"
+          : company.destacada
+            ? "Empresa destacada"
+            : "Empresa en El Aldeano",
+
+    // =========================
+    // BADGE
+    // =========================
 
     badge:
-      company.premium
-        ? "PREMIUM"
-        : company.destacada
-          ? "DESTACADA"
-          : "EMPRESA",
+      getBadge(company),
 
     badgeTipo:
-      company.premium
-        ? "destacada"
-        : company.destacada
-          ? "destacada"
-          : "activa",
+      getBadgeType(company),
 
     premium:
       Boolean(company.premium),
+
+    destacada:
+      Boolean(company.destacada),
+
+    // =========================
+    // ENLACE DE LA TARJETA
+    // =========================
 
     url:
       company.sitio_web ||
       "https://www.elaldeano.online"
   };
+}
+
+function getBadge(company) {
+  const origen =
+    String(company.origen || "").toLowerCase();
+
+  if (origen === "youtube") {
+    return "VIDEO";
+  }
+
+  if (
+    origen === "wix_group" ||
+    origen === "wixgroups"
+  ) {
+    return "NUEVO POST";
+  }
+
+  if (origen === "rss") {
+    return "NOVEDAD";
+  }
+
+  if (company.premium) {
+    return "PREMIUM";
+  }
+
+  if (company.destacada) {
+    return "DESTACADA";
+  }
+
+  return "EMPRESA";
+}
+
+function getBadgeType(company) {
+  const origen =
+    String(company.origen || "").toLowerCase();
+
+  if (origen === "youtube") {
+    return "video";
+  }
+
+  if (
+    origen === "wix_group" ||
+    origen === "wixgroups"
+  ) {
+    return "destacada";
+  }
+
+  if (origen === "rss") {
+    return "nueva";
+  }
+
+  if (company.premium) {
+    return "destacada";
+  }
+
+  if (company.destacada) {
+    return "destacada";
+  }
+
+  return "activa";
 }
 
 function isValidCompany(company) {

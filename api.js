@@ -111,6 +111,7 @@ function normalizeCompany(company) {
     // =========================
 
     url:
+      company.actividad_url ||
       company.sitio_web ||
       "https://www.elaldeano.online"
   };

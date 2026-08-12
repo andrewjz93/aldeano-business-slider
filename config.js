@@ -7,14 +7,14 @@ export const CONFIG = {
 
   pauseOnFocus: true,
 
-  duplicateItems: true,
+  duplicateItems: false,
 
   shuffleItems: false,
 
   maximumCompanies: 100,
 
   dataSource:
-  "https://aldeano-business-api.andrewjz93.workers.dev/v1/empresas",
+    "https://aldeano-business-api.andrewjz93.workers.dev/v1/feed",
 
   debug: true
 };

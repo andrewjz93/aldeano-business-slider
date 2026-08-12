@@ -1,5 +1,5 @@
 export const CONFIG = {
-  speed: 50,
+  speed: 25,
 
   autoplay: true,
 

@@ -14,7 +14,6 @@ export const CONFIG = {
   maximumCompanies: 100,
 
   dataSource:
-    "https://aldeano-business-api.andrewjz93.workers.dev/v1/feed",
-
+  "https://aldeano-business-api.andrewjz93.workers.dev/v1/stories",
   debug: true
 };

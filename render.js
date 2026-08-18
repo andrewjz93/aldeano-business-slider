@@ -1,241 +1,390 @@
-export function renderCompanies(track, companies) {
-  track.innerHTML = companies
-    .map(createCompanyCard)
-    .join("");
+// ======================================================
+// RENDER DE HISTORIAS
+// ======================================================
+
+export function renderCompanies(
+  track,
+  companies
+) {
+
+  track.innerHTML =
+    companies
+      .map(createCompanyCard)
+      .join("");
+
 }
 
-export function createCompanyCard(company) {
-  const premiumStar = company.premium
-    ? `
-      <span
-        class="premium-star"
-        title="Empresa Premium"
-        aria-label="Empresa Premium"
-      >
-        ⭐
-      </span>
-    `
-    : "";
 
-  const activityType =
-    company.origen ||
-    company.badgeTipo ||
-    "empresa";
+// ======================================================
+// CREAR TARJETA
+// ======================================================
 
-  const badgeType = sanitizeClassName(
-    normalizeBadgeType(activityType)
-  );
+export function createCompanyCard(
+  company
+) {
 
-  const activityIcon = getActivityIcon(
-    activityType
-  );
-
-  const activityText = getActivityText(
-    company
-  );
-
-  const badgeText = getBadgeText(
-    company
-  );
-
-  const cardUrl =
+  const url =
     company.url ||
-    company.sitio_web ||
-    "#";
+    "https://www.elaldeano.online";
+
+
+  const titulo =
+    company.titulo ||
+    "Nueva publicación";
+
+
+  const comunidad =
+    company.comunidad ||
+    company.nombre ||
+    "Comunidad";
+
+
+  const empresa =
+    company.empresa ||
+    company.nombre ||
+    "";
+
+
+  const autor =
+    company.autor ||
+    "";
+
+
+  const imagen =
+    company.imagen ||
+    "";
+
+
+  const logo =
+    company.logoComunidad ||
+    company.logo ||
+    "";
+
+
+  const fecha =
+    company.fechaTexto ||
+    "";
+
+
+  const badge =
+    obtenerBadge(
+      company
+    );
+
 
   return `
+
     <a
-      class="company-card"
-      href="${escapeAttribute(cardUrl)}"
+      class="story-card"
+      href="${escapeAttribute(url)}"
       target="_top"
       rel="noopener noreferrer"
-      aria-label="Ver empresa ${escapeAttribute(company.nombre)}"
+      aria-label="Ver publicación: ${escapeAttribute(titulo)}"
     >
-      <div class="card-image-wrapper">
-        <img
-          class="card-image"
-          src="${escapeAttribute(company.imagen)}"
-          alt="${escapeAttribute(company.nombre)}"
-          loading="lazy"
-        >
 
-        <div class="card-overlay"></div>
 
-        ${premiumStar}
+      <!-- ==============================
+           IMAGEN
+      =============================== -->
 
-        <span
-          class="company-badge badge-${badgeType}"
-        >
-          ${escapeHtml(badgeText)}
+      <div class="story-cover">
+
+
+        ${
+          imagen
+
+            ? `
+              <img
+                class="story-image"
+                src="${escapeAttribute(imagen)}"
+                alt="${escapeAttribute(titulo)}"
+                loading="lazy"
+              >
+            `
+
+            : `
+              <div class="story-image-placeholder">
+              </div>
+            `
+        }
+
+
+        <div class="story-overlay"></div>
+
+
+        <!-- ============================
+             BADGE
+        ============================= -->
+
+        <span class="story-badge">
+          ${escapeHtml(badge)}
         </span>
 
-        <img
-          class="company-logo"
-          src="${escapeAttribute(
-            company.logo || company.imagen
-          )}"
-          alt="Logo de ${escapeAttribute(company.nombre)}"
-          loading="lazy"
-        >
+
+        <!-- ============================
+             PERFIL COMUNIDAD
+        ============================= -->
+
+        ${
+          logo
+
+            ? `
+              <img
+                class="story-logo"
+                src="${escapeAttribute(logo)}"
+                alt="Perfil de ${escapeAttribute(comunidad)}"
+                loading="lazy"
+              >
+            `
+
+            : `
+              <div
+                class="story-logo story-logo-fallback"
+              >
+                ${escapeHtml(
+                  obtenerInicial(
+                    comunidad
+                  )
+                )}
+              </div>
+            `
+        }
+
+
       </div>
 
-      <div class="card-content">
-        <h3 class="company-name">
-          ${escapeHtml(company.nombre)}
+
+      <!-- ==============================
+           CONTENIDO
+      =============================== -->
+
+      <div class="story-body">
+
+
+        <!-- COMUNIDAD -->
+
+        <div class="story-community">
+          ${escapeHtml(comunidad)}
+        </div>
+
+
+        <!-- EMPRESA -->
+
+        ${
+          empresa &&
+          empresa !== comunidad
+
+            ? `
+              <div class="story-company">
+                por ${escapeHtml(empresa)}
+              </div>
+            `
+
+            : ""
+        }
+
+
+        <!-- TÍTULO -->
+
+        <h3 class="story-title">
+          ${escapeHtml(titulo)}
         </h3>
 
-        <p class="company-category">
-          ${escapeHtml(
-            company.categoria || "Empresa"
-          )}
-        </p>
 
-        <p class="company-location">
-          <span aria-hidden="true">📍</span>
+        <!-- AUTOR -->
 
-          <span>
-            ${escapeHtml(
-              company.ciudad || "Argentina"
-            )}
-          </span>
-        </p>
+        ${
+          autor
 
-        <p class="company-activity">
-          <span aria-hidden="true">
-            ${activityIcon}
-          </span>
+            ? `
+              <div class="story-author">
+                ${escapeHtml(autor)}
+              </div>
+            `
 
-          <span>
-            ${escapeHtml(activityText)}
-          </span>
-        </p>
+            : ""
+        }
+
+
+        <!-- FECHA -->
+
+        ${
+          fecha
+
+            ? `
+              <div class="story-date">
+                <span aria-hidden="true">
+                  🕒
+                </span>
+
+                ${escapeHtml(fecha)}
+              </div>
+            `
+
+            : ""
+        }
+
+
       </div>
+
     </a>
+
   `;
+
 }
 
-export function showError(track, message) {
+
+// ======================================================
+// ERROR
+// ======================================================
+
+export function showError(
+  track,
+  message
+) {
+
   track.innerHTML = `
+
     <div class="error-message">
+
       ${escapeHtml(message)}
+
     </div>
+
   `;
+
 }
 
-function getActivityText(company) {
-  if (company.titulo) {
-    return company.titulo;
+
+// ======================================================
+// BADGE
+// ======================================================
+
+function obtenerBadge(
+  company
+) {
+
+  const tipo =
+    String(
+      company.tipo ||
+      company.origen ||
+      ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  switch (tipo) {
+
+    case "youtube":
+    case "video":
+
+      return "VIDEO";
+
+
+    case "promo":
+    case "promocion":
+
+      return "PROMO";
+
+
+    case "rss":
+    case "noticia":
+
+      return "NOVEDAD";
+
+
+    case "evento":
+
+      return "EVENTO";
+
+
+    case "wix_group":
+    case "wixgroups":
+    case "post":
+
+      return "NUEVO POST";
+
+
+    default:
+
+      return "HISTORIA";
+
   }
 
-  if (company.actividad) {
-    return company.actividad;
-  }
-
-  if (company.premium) {
-    return "Empresa Premium";
-  }
-
-  if (company.destacada) {
-    return "Empresa destacada";
-  }
-
-  return "Empresa en El Aldeano";
 }
 
-function getBadgeText(company) {
-  const origin = String(
-    company.origen || ""
-  ).toLowerCase();
 
-  if (origin === "youtube") {
-    return "VIDEO";
+// ======================================================
+// INICIAL DE COMUNIDAD
+// ======================================================
+
+function obtenerInicial(
+  value
+) {
+
+  const texto =
+    String(
+      value || ""
+    )
+      .trim();
+
+
+  if (!texto) {
+
+    return "A";
+
   }
 
-  if (
-    origin === "wix_group" ||
-    origin === "wixgroups"
-  ) {
-    return "NUEVO POST";
-  }
 
-  if (origin === "rss") {
-    return "NOVEDAD";
-  }
+  return texto
+    .charAt(0)
+    .toUpperCase();
 
-  if (company.premium) {
-    return "PREMIUM";
-  }
-
-  if (company.destacada) {
-    return "DESTACADA";
-  }
-
-  return company.badge || "EMPRESA";
 }
 
-function getActivityIcon(type) {
-  const normalized =
-    String(type || "").toLowerCase();
 
-  const icons = {
-    youtube: "🎥",
-    video: "🎥",
+// ======================================================
+// SEGURIDAD HTML
+// ======================================================
 
-    wix_group: "📰",
-    wixgroups: "📰",
+function escapeHtml(
+  value
+) {
 
-    rss: "📰",
+  return String(
+    value ?? ""
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
 
-    activa: "🟢",
-    promo: "🎁",
-    promocion: "🎁",
-    destacada: "⭐",
-    nueva: "🆕",
-    empresa: "🏢"
-  };
-
-  return icons[normalized] || "🏢";
 }
 
-function normalizeBadgeType(type) {
-  const normalized =
-    String(type || "").toLowerCase();
 
-  const mapping = {
-    youtube: "video",
-    video: "video",
+function escapeAttribute(
+  value
+) {
 
-    wix_group: "destacada",
-    wixgroups: "destacada",
+  return escapeHtml(
+    value
+  );
 
-    rss: "nueva",
-
-    promocion: "promo",
-    promo: "promo",
-
-    activa: "activa",
-    destacada: "destacada",
-    nueva: "nueva"
-  };
-
-  return mapping[normalized] || "activa";
-}
-
-function sanitizeClassName(value) {
-  return String(value || "empresa")
-    .toLowerCase()
-    .replace(/[^a-z0-9_-]/g, "");
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function escapeAttribute(value) {
-  return escapeHtml(value);
 }

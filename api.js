@@ -278,9 +278,9 @@ function normalizeStory(story) {
       fecha,
 
     fechaTexto:
-      formatRelativeDate(
-        fecha
-      ),
+  formatHour(
+    fecha
+            ),
 
 
     // =====================================
@@ -514,12 +514,8 @@ function isValidStory(story) {
   return Boolean(
     story &&
     story.id !== undefined &&
-    (
-      story.titulo ||
-      story.descripcion
-    ) &&
+    story.titulo &&
     story.imagen &&
-    story.logo &&
     story.url
   );
 
@@ -626,6 +622,34 @@ function formatearHora(fecha) {
     new Date(fecha);
 
   return date.toLocaleTimeString(
+    "es-AR",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    }
+  );
+
+}
+
+function formatHour(value) {
+
+  if (!value) {
+    return "";
+  }
+
+  const fecha =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      fecha.getTime()
+    )
+  ) {
+    return "";
+  }
+
+  return fecha.toLocaleTimeString(
     "es-AR",
     {
       hour: "2-digit",

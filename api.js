@@ -145,8 +145,9 @@ function normalizeStory(story) {
   const logoComunidad =
     story.logoComunidad ||
     story.logo_comunidad ||
+    story.logoEmpresa ||
+    story.logo_empresa ||
     story.logo ||
-    story.cover_comunidad ||
     "";
 
 
@@ -158,10 +159,8 @@ function normalizeStory(story) {
 
   const logo =
     logoComunidad ||
-    story.logo ||
-    imagen;
-
-
+    "";
+   
   // ==================================================
   // FECHA
   // ==================================================
@@ -614,5 +613,25 @@ function mezclarPorComunidad(
 
 
   return resultado;
+
+}
+
+function formatearHora(fecha) {
+
+  if (!fecha) {
+    return "";
+  }
+
+  const date =
+    new Date(fecha);
+
+  return date.toLocaleTimeString(
+    "es-AR",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    }
+  );
 
 }

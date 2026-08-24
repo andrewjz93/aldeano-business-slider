@@ -83,6 +83,10 @@
         box-shadow .25s ease;
 }
 
+.slider-header h2{
+    color: black !important;
+}
+
 
 /* ==========================================================
    PRIMERA HISTORIA DESTACADA
@@ -90,31 +94,10 @@
 
 .story-card:first-child{
 
-    flex-basis:calc((100% - 80px) / 5);
-
-    min-width:230px;
-
-    max-width:270px;
-
-    height:320px;
-
-    border-top:4px solid var(--primary);
+    border-top:none;
 
 }
 
-
-.story-card:first-child .story-cover{
-
-    height:170px;
-
-}
-
-
-.story-card:first-child .story-title{
-
-    font-size:14px;
-
-}
 
 .story-card:hover{
 
@@ -313,20 +296,6 @@
 }
 
 /* ==========================================================
-   EMPRESA
-========================================================== */
-
-.story-company{
-
-    margin-top:3px;
-
-    color:#888;
-
-    font-size:9px;
-
-}
-
-/* ==========================================================
    TITULO
 ========================================================== */
 
@@ -360,20 +329,23 @@
 
 .story-author{
 
-    margin-top:8px;
+    font-size:11px;
 
-    font-size:10px;
-
-    color:#666;
+    color:#777;
 
     font-weight:500;
+
+    margin-top:4px;
+
+    margin-bottom:6px;
+
+    line-height:1.2;
 
     white-space:nowrap;
 
     overflow:hidden;
 
     text-overflow:ellipsis;
-
 }
 
 /* ==========================================================
@@ -537,4 +509,8 @@
         0 14px 30px
         rgba(0,0,0,.16);
 
+}
+
+.story-company {
+    display: none !important;
 }

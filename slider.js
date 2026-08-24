@@ -20,25 +20,41 @@ document.addEventListener(
 );
 
 
+// =====================================================
+// INICIAR SLIDER
+// =====================================================
+
 async function initializeSlider() {
+
   const track =
-    document.getElementById("sliderTrack");
+    document.getElementById(
+      "sliderTrack"
+    );
 
   const viewport =
-    document.getElementById("sliderViewport");
+    document.getElementById(
+      "sliderViewport"
+    );
 
 
-  if (!track || !viewport) {
+  if (
+    !track ||
+    !viewport
+  ) {
 
     console.error(
       "[Aldeano Slider] Faltan elementos en index.html:",
       {
-        sliderTrack: track,
-        sliderViewport: viewport
+        sliderTrack:
+          track,
+
+        sliderViewport:
+          viewport
       }
     );
 
     return;
+
   }
 
 
@@ -48,7 +64,11 @@ async function initializeSlider() {
       await loadCompanies();
 
 
-    if (!Array.isArray(companies)) {
+    if (
+      !Array.isArray(
+        companies
+      )
+    ) {
 
       throw new Error(
         "La fuente no devolvió una lista válida."
@@ -57,15 +77,29 @@ async function initializeSlider() {
     }
 
 
-    if (CONFIG.shuffleItems) {
+    // =================================================
+    // MEZCLAR SI ESTÁ ACTIVADO
+    // =================================================
+
+    if (
+      CONFIG.shuffleItems
+    ) {
 
       companies =
-        shuffleArray(companies);
+        shuffleArray(
+          companies
+        );
 
     }
 
 
-    if (companies.length === 0) {
+    // =================================================
+    // SIN PUBLICACIONES
+    // =================================================
+
+    if (
+      companies.length === 0
+    ) {
 
       showError(
         track,
@@ -77,15 +111,9 @@ async function initializeSlider() {
     }
 
 
-    /*
-     * IMPORTANTE:
-     *
-     * Ya NO fabricamos copias adicionales
-     * para llegar a 20 tarjetas.
-     *
-     * Cada tarjeta corresponde a un registro
-     * real devuelto por /v1/feed.
-     */
+    // =================================================
+    // LISTA ORIGINAL
+    // =================================================
 
     const sliderCompanies =
       prepareSliderList(
@@ -93,40 +121,73 @@ async function initializeSlider() {
       );
 
 
+    const originalCount =
+      sliderCompanies.length;
+
+
+    // =================================================
+    // DUPLICAR PARA LOOP INFINITO
+    //
+    // Ejemplo:
+    //
+    // A B C D
+    // A B C D
+    //
+    // La animación recorre solamente la primera copia.
+    // =================================================
+
+    const infiniteCompanies = [
+      ...sliderCompanies,
+      ...sliderCompanies
+    ];
+
+
+    // =================================================
+    // RENDER
+    // =================================================
+
     renderCompanies(
       track,
-      sliderCompanies
+      infiniteCompanies
     );
 
 
-    /*
-     * Solo iniciamos la animación cuando
-     * realmente hay más de una tarjeta.
-     */
+    // =================================================
+    // INICIAR ANIMACIÓN
+    // =================================================
 
     if (
       CONFIG.autoplay &&
-      sliderCompanies.length > 1
+      originalCount > 1
     ) {
 
-      requestAnimationFrame(() => {
+      requestAnimationFrame(
+        () => {
 
-        requestAnimationFrame(() => {
+          requestAnimationFrame(
+            () => {
 
-          startSlider(
-            track,
-            viewport
+              startSlider(
+                track,
+                viewport,
+                originalCount
+              );
+
+            }
           );
 
-        });
-
-      });
+        }
+      );
 
     }
 
 
+    // =================================================
+    // DEBUG
+    // =================================================
+
     debugLog(
-      `${companies.length} publicaciones cargadas`
+      `${originalCount} publicaciones cargadas`
     );
 
 
@@ -144,49 +205,43 @@ async function initializeSlider() {
     );
 
   }
-}
-
-
-/*
- * =====================================================
- * PREPARAR LISTA
- * =====================================================
- *
- * No repetimos contenido artificialmente.
- *
- * Si el feed devuelve:
- *
- * Tecnova post 1
- * Tecnova post 2
- * Agro Sur
- * Fercam
- *
- * esas son exactamente las tarjetas que
- * renderizamos.
- */
-
-function prepareSliderList(companies) {
-
-  return [...companies];
 
 }
 
 
-/*
- * =====================================================
- * MEZCLAR CONTENIDO
- * =====================================================
- */
+// =====================================================
+// PREPARAR LISTA
+// =====================================================
 
-function shuffleArray(items) {
+function prepareSliderList(
+  companies
+) {
+
+  return [
+    ...companies
+  ];
+
+}
+
+
+// =====================================================
+// MEZCLAR CONTENIDO
+// =====================================================
+
+function shuffleArray(
+  items
+) {
 
   const copy =
     [...items];
 
 
   for (
-    let index = copy.length - 1;
+    let index =
+      copy.length - 1;
+
     index > 0;
+
     index--
   ) {
 
@@ -213,15 +268,17 @@ function shuffleArray(items) {
 }
 
 
-/*
- * =====================================================
- * DEBUG
- * =====================================================
- */
+// =====================================================
+// DEBUG
+// =====================================================
 
-function debugLog(message) {
+function debugLog(
+  message
+) {
 
-  if (CONFIG.debug) {
+  if (
+    CONFIG.debug
+  ) {
 
     console.log(
       `[Aldeano Business Slider] ${message}`

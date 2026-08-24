@@ -45,9 +45,9 @@ export function createCompanyCard(
     "";
 
 
-  const autor =
-    company.autor ||
-    "";
+  const autor = autorVisible(
+    company.autor
+);
 
 
   const imagen =
@@ -64,13 +64,6 @@ export function createCompanyCard(
   const fecha =
     company.fechaTexto ||
     "";
-
-
-  const badge =
-    obtenerBadge(
-      company
-    );
-
 
   return `
 
@@ -113,14 +106,10 @@ export function createCompanyCard(
 
 
         <!-- ============================
-             BADGE
+             Badge eliminado
         ============================= -->
 
-        <span class="story-badge">
-          ${escapeHtml(badge)}
-        </span>
-
-
+        
         <!-- ============================
              PERFIL COMUNIDAD
         ============================= -->
@@ -155,81 +144,76 @@ export function createCompanyCard(
 
 
       <!-- ==============================
-           CONTENIDO
+       CONTENIDO
       =============================== -->
 
-      <div class="story-body">
+  <div class="story-body">
+
+    <!-- COMUNIDAD -->
+
+    <div class="story-community">
+      ${escapeHtml(comunidad)}
+    </div>
 
 
-        <!-- COMUNIDAD -->
+    <!-- EMPRESA -->
 
-        <div class="story-community">
-          ${escapeHtml(comunidad)}
-        </div>
+    ${
+      empresa &&
+      empresa !== comunidad
 
+        ? `
+          <div class="story-company">
+            por ${escapeHtml(empresa)}
+          </div>
+        `
 
-        <!-- EMPRESA -->
-
-        ${
-          empresa &&
-          empresa !== comunidad
-
-            ? `
-              <div class="story-company">
-                por ${escapeHtml(empresa)}
-              </div>
-            `
-
-            : ""
-        }
+        : ""
+    }
 
 
-        <!-- TÍTULO -->
+    <!-- AUTOR -->
 
-        <h3 class="story-title">
-          ${escapeHtml(titulo)}
-        </h3>
+    ${
+      autor
 
+        ? `
+          <div class="story-author">
+            ${escapeHtml(autor)}
+          </div>
+        `
 
-        <!-- AUTOR -->
-
-        ${
-          autor
-
-            ? `
-              <div class="story-author">
-                ${escapeHtml(autor)}
-              </div>
-            `
-
-            : ""
-        }
+        : ""
+    }
 
 
-        <!-- FECHA -->
+    <!-- TÍTULO -->
 
-        ${
-          fecha
-
-            ? `
-              <div class="story-date">
-                <span aria-hidden="true">
-                  🕒
-                </span>
-
-                ${escapeHtml(fecha)}
-              </div>
-            `
-
-            : ""
-        }
+    <h3 class="story-title">
+      ${escapeHtml(titulo)}
+    </h3>
 
 
-      </div>
+    <!-- FECHA -->
 
-    </a>
+    ${
+      fecha
 
-  `;
+        ? `
+          <div class="story-date">
+            <span aria-hidden="true">🕒</span>
+            ${escapeHtml(fecha)}
+          </div>
+        `
+
+        : ""
+    }
+
+  </div>
+
+</a>
+
+`;
 
 }
 
@@ -303,7 +287,12 @@ function obtenerBadge(
     case "wixgroups":
     case "post":
 
-      return "NUEVO POST";
+    return (
+      company.autor ||
+      company.empresa ||
+      company.comunidad ||
+     "El Aldeano"
+  );
 
 
     default:
@@ -387,4 +376,27 @@ function escapeAttribute(
     value
   );
 
+}
+
+function autorVisible(valor) {
+
+    const autor = String(valor || "").trim();
+
+    if (!autor) {
+        return "";
+    }
+
+    const ocultar = [
+        "admin",
+        "administrador",
+        "system",
+        "owner",
+        "propietario"
+    ];
+
+    if (ocultar.includes(autor.toLowerCase())) {
+        return "";
+    }
+
+    return autor;
 }

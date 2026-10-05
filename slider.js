@@ -1,7 +1,7 @@
 import { CONFIG } from "./config.js";
 import { loadCompanies } from "./api.js";
 import { renderCompanies, showError } from "./render.js";
-import { startSlider, stopSlider } from "./animation.js";
+import { startSlider, stopSlider, isSliderInteracting } from "./animation.js";
 
 document.addEventListener("DOMContentLoaded", initializeSlider);
 
@@ -24,8 +24,7 @@ function initializeSlider() {
       const nextSignature = JSON.stringify(companies);
       // No reiniciar el movimiento cuando los datos no cambiaron ni
       // reemplazar una tarjeta mientras el usuario la está usando.
-      const interacting = viewport.matches(":hover") ||
-        viewport.contains(document.activeElement);
+      const interacting = isSliderInteracting();
       if (nextSignature !== signature && (signature === null || !interacting)) {
         stopSlider();
         if (!companies.length) {

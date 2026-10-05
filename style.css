@@ -547,3 +547,8 @@
 .slider-arrow:hover { background: #efeeff; }
 .slider-arrow:focus-visible { outline: 3px solid var(--primary); outline-offset: -4px; }
 .slider-arrow:disabled { opacity: .35; cursor: default; }
+
+/* Arrastre horizontal propio; scroll vertical y zoom a cargo del navegador. */
+.slider-viewport { touch-action: pan-y pinch-zoom; }
+.story-card { -webkit-user-drag: none; }
+.story-image, .story-logo { user-select: none; -webkit-user-select: none; -webkit-user-drag: none; }

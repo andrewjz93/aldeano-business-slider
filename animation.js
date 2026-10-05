@@ -16,6 +16,84 @@ let navigationTimer = null;
 let loopDuration = 0;
 let stepDuration = 0;
 let animationGeneration = 0;
+let gesture = null;
+let lastInputWasTouch = false;
+let suppressClickUntil = 0;
+
+export function isSliderInteracting() {
+  return Boolean(gesture || navigationTimer !== null || (!lastInputWasTouch && (
+    (CONFIG.pauseOnHover && currentViewport?.matches(":hover")) ||
+    (CONFIG.pauseOnFocus && currentViewport?.contains(document.activeElement))
+  )));
+}
+
+function resumeAfterInteraction() {
+  clearTimeout(navigationTimer);
+  navigationTimer = setTimeout(() => {
+    navigationTimer = null;
+    resumeSlider();
+  }, 2500);
+}
+
+function configureTouch(viewport) {
+  // El navegador conserva el desplazamiento vertical y el gesto de zoom.
+  viewport.addEventListener("touchstart", event => {
+    lastInputWasTouch = true;
+    if (event.touches.length !== 1) {
+      if (gesture?.axis === "horizontal") suppressClickUntil = Date.now() + 800;
+      gesture = null;
+      resumeAfterInteraction();
+      return;
+    }
+    suppressClickUntil = 0;
+    if (event.target.closest(".slider-arrow") || !sliderAnimation) return;
+    const touch = event.touches[0];
+    clearTimeout(navigationTimer);
+    navigationTimer = null;
+    pauseSlider();
+    gesture = { id: touch.identifier, x: touch.clientX, y: touch.clientY,
+      time: Number(sliderAnimation.currentTime || 0), axis: null };
+  }, { passive: true });
+
+  viewport.addEventListener("touchmove", event => {
+    if (!gesture || !sliderAnimation || event.touches.length !== 1) return;
+    const touch = Array.from(event.touches).find(item => item.identifier === gesture.id);
+    if (!touch) return;
+    const dx = touch.clientX - gesture.x;
+    const dy = touch.clientY - gesture.y;
+    if (!gesture.axis) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < 12) return;
+      gesture.axis = Math.abs(dx) > Math.abs(dy) * 1.2 ? "horizontal" : "vertical";
+    }
+    if (gesture.axis !== "horizontal") return;
+    if (event.cancelable) event.preventDefault();
+    suppressClickUntil = Date.now() + 800;
+    const speed = Math.max(Number(CONFIG.speed) || 24, 1);
+    const next = gesture.time - dx / speed * 1000;
+    sliderAnimation.currentTime = ((next % loopDuration) + loopDuration) % loopDuration;
+  }, { passive: false });
+
+  const finish = () => {
+    if (!gesture) return;
+    if (gesture.axis === "horizontal") suppressClickUntil = Date.now() + 800;
+    gesture = null;
+    resumeAfterInteraction();
+  };
+  viewport.addEventListener("touchend", finish, { passive: true });
+  viewport.addEventListener("touchcancel", finish, { passive: true });
+  viewport.addEventListener("click", event => {
+    // Un toque nuevo limpia este bloqueo; los clics de teclado siguen disponibles.
+    if (event.detail !== 0 && Date.now() < suppressClickUntil) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      suppressClickUntil = 0;
+    }
+  }, true);
+  viewport.addEventListener("pointermove", event => {
+    if (event.pointerType === "mouse") lastInputWasTouch = false;
+  }, { passive: true });
+  viewport.addEventListener("keydown", () => { lastInputWasTouch = false; });
+}
 
 function setNavigationEnabled(enabled) {
   for (const id of ["sliderPrev", "sliderNext"]) {
@@ -30,11 +108,7 @@ export function moveSlider(direction) {
   const next = Number(sliderAnimation.currentTime || 0) + direction * stepDuration;
   // El módulo positivo permite retroceder desde la primera tarjeta a la última.
   sliderAnimation.currentTime = ((next % loopDuration) + loopDuration) % loopDuration;
-  clearTimeout(navigationTimer);
-  navigationTimer = setTimeout(() => {
-    navigationTimer = null;
-    resumeSlider();
-  }, 2500);
+  resumeAfterInteraction();
 }
 
 
@@ -103,6 +177,7 @@ export function startSlider(
 // =====================================================
 
 export function stopSlider() {
+  gesture = null;
   animationGeneration++;
   clearTimeout(navigationTimer);
   navigationTimer = null;
@@ -146,9 +221,7 @@ export function pauseSlider() {
 // =====================================================
 
 export function resumeSlider() {
-  if (document.hidden || navigationTimer !== null ||
-      (CONFIG.pauseOnHover && currentViewport?.matches(":hover")) ||
-      (CONFIG.pauseOnFocus && currentViewport?.contains(document.activeElement))) return;
+  if (document.hidden || isSliderInteracting()) return;
 
   if (
     sliderAnimation &&
@@ -330,9 +403,7 @@ function createAnimation(
   // ==================================================
 
   if (
-    !CONFIG.autoplay || document.hidden ||
-    (CONFIG.pauseOnHover && viewport.matches(":hover")) ||
-    (CONFIG.pauseOnFocus && viewport.contains(document.activeElement))
+    !CONFIG.autoplay || document.hidden || isSliderInteracting()
   ) {
 
     sliderAnimation.pause();
@@ -446,32 +517,7 @@ function configureInteractions(
   // TOUCH
   // ==================================================
 
-  viewport.addEventListener(
-    "touchstart",
-    pauseSlider,
-    {
-      passive: true
-    }
-  );
-
-
-  viewport.addEventListener(
-    "touchend",
-    resumeSlider,
-    {
-      passive: true
-    }
-  );
-
-
-  viewport.addEventListener(
-    "touchcancel",
-    resumeSlider,
-    {
-      passive: true
-    }
-  );
-
+  configureTouch(viewport);
 
   // ==================================================
   // PESTAÑA OCULTA

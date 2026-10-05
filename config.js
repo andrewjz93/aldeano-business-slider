@@ -1,5 +1,6 @@
 export const CONFIG = {
   speed: 25,
+  refreshIntervalMs: 60000,
 
   autoplay: true,
 

@@ -1,289 +1,69 @@
 import { CONFIG } from "./config.js";
+import { loadCompanies } from "./api.js";
+import { renderCompanies, showError } from "./render.js";
+import { startSlider, stopSlider } from "./animation.js";
 
-import {
-  loadCompanies
-} from "./api.js";
+document.addEventListener("DOMContentLoaded", initializeSlider);
 
-import {
-  renderCompanies,
-  showError
-} from "./render.js";
+function initializeSlider() {
+  const track = document.getElementById("sliderTrack");
+  const viewport = document.getElementById("sliderViewport");
+  if (!track || !viewport) return;
 
-import {
-  startSlider
-} from "./animation.js";
+  const interval = Math.max(Number(CONFIG.refreshIntervalMs) || 60000, 10000);
+  let timer;
+  let loading = false;
+  let signature = null;
 
-
-document.addEventListener(
-  "DOMContentLoaded",
-  initializeSlider
-);
-
-
-// =====================================================
-// INICIAR SLIDER
-// =====================================================
-
-async function initializeSlider() {
-
-  const track =
-    document.getElementById(
-      "sliderTrack"
-    );
-
-  const viewport =
-    document.getElementById(
-      "sliderViewport"
-    );
-
-
-  if (
-    !track ||
-    !viewport
-  ) {
-
-    console.error(
-      "[Aldeano Slider] Faltan elementos en index.html:",
-      {
-        sliderTrack:
-          track,
-
-        sliderViewport:
-          viewport
-      }
-    );
-
-    return;
-
-  }
-
-
-  try {
-
-    let companies =
-      await loadCompanies();
-
-
-    if (
-      !Array.isArray(
-        companies
-      )
-    ) {
-
-      throw new Error(
-        "La fuente no devolvió una lista válida."
-      );
-
-    }
-
-
-    // =================================================
-    // MEZCLAR SI ESTÁ ACTIVADO
-    // =================================================
-
-    if (
-      CONFIG.shuffleItems
-    ) {
-
-      companies =
-        shuffleArray(
-          companies
-        );
-
-    }
-
-
-    // =================================================
-    // SIN PUBLICACIONES
-    // =================================================
-
-    if (
-      companies.length === 0
-    ) {
-
-      showError(
-        track,
-        "No hay publicaciones disponibles."
-      );
-
-      return;
-
-    }
-
-
-    // =================================================
-    // LISTA ORIGINAL
-    // =================================================
-
-    const sliderCompanies =
-      prepareSliderList(
-        companies
-      );
-
-
-    const originalCount =
-      sliderCompanies.length;
-
-
-    // =================================================
-    // DUPLICAR PARA LOOP INFINITO
-    //
-    // Ejemplo:
-    //
-    // A B C D
-    // A B C D
-    //
-    // La animación recorre solamente la primera copia.
-    // =================================================
-
-    const infiniteCompanies = [
-      ...sliderCompanies,
-      ...sliderCompanies
-    ];
-
-
-    // =================================================
-    // RENDER
-    // =================================================
-
-    renderCompanies(
-      track,
-      infiniteCompanies
-    );
-
-
-    // =================================================
-    // INICIAR ANIMACIÓN
-    // =================================================
-
-    if (
-      CONFIG.autoplay &&
-      originalCount > 1
-    ) {
-
-      requestAnimationFrame(
-        () => {
-
-          requestAnimationFrame(
-            () => {
-
-              startSlider(
-                track,
-                viewport,
-                originalCount
-              );
-
-            }
-          );
-
+  async function refresh() {
+    clearTimeout(timer);
+    if (loading || document.hidden) return;
+    loading = true;
+    try {
+      const companies = await loadCompanies();
+      const nextSignature = JSON.stringify(companies);
+      // No reiniciar el movimiento cuando los datos no cambiaron ni
+      // reemplazar una tarjeta mientras el usuario la está usando.
+      const interacting = viewport.matches(":hover") ||
+        viewport.contains(document.activeElement);
+      if (nextSignature !== signature && (signature === null || !interacting)) {
+        stopSlider();
+        if (!companies.length) {
+          showError(track, "No hay publicaciones disponibles.");
+        } else {
+          const items = CONFIG.shuffleItems ? shuffleArray(companies) : companies;
+          renderCompanies(track, items.length > 1 ? [...items, ...items] : items);
+          if (CONFIG.autoplay && items.length > 1) {
+            startSlider(track, viewport, items.length);
+          }
         }
-      );
-
+        signature = nextSignature;
+      }
+    } catch (error) {
+      console.error("[Aldeano Slider] No se pudo actualizar:", error);
+      // Una interrupción de red no debe borrar las historias ya cargadas.
+      if (signature === null) {
+        showError(track, "No fue posible cargar las publicaciones. Reintentando…");
+      }
+    } finally {
+      loading = false;
+      if (!document.hidden) timer = setTimeout(refresh, interval);
     }
-
-
-    // =================================================
-    // DEBUG
-    // =================================================
-
-    debugLog(
-      `${originalCount} publicaciones cargadas`
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      "[Aldeano Slider] Error al iniciar:",
-      error
-    );
-
-
-    showError(
-      track,
-      "No fue posible cargar las publicaciones."
-    );
-
   }
 
+  document.addEventListener("visibilitychange", () => {
+    clearTimeout(timer);
+    if (!document.hidden) void refresh();
+  });
+  window.addEventListener("online", () => void refresh());
+  void refresh();
 }
 
-
-// =====================================================
-// PREPARAR LISTA
-// =====================================================
-
-function prepareSliderList(
-  companies
-) {
-
-  return [
-    ...companies
-  ];
-
-}
-
-
-// =====================================================
-// MEZCLAR CONTENIDO
-// =====================================================
-
-function shuffleArray(
-  items
-) {
-
-  const copy =
-    [...items];
-
-
-  for (
-    let index =
-      copy.length - 1;
-
-    index > 0;
-
-    index--
-  ) {
-
-    const randomIndex =
-      Math.floor(
-        Math.random() *
-        (index + 1)
-      );
-
-
-    [
-      copy[index],
-      copy[randomIndex]
-    ] = [
-      copy[randomIndex],
-      copy[index]
-    ];
-
+function shuffleArray(items) {
+  const copy = [...items];
+  for (let index = copy.length - 1; index > 0; index--) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [copy[index], copy[randomIndex]] = [copy[randomIndex], copy[index]];
   }
-
-
   return copy;
-
-}
-
-
-// =====================================================
-// DEBUG
-// =====================================================
-
-function debugLog(
-  message
-) {
-
-  if (
-    CONFIG.debug
-  ) {
-
-    console.log(
-      `[Aldeano Business Slider] ${message}`
-    );
-
-  }
-
 }

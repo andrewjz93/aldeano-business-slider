@@ -11,7 +11,8 @@ export async function loadCompanies() {
     await fetch(
       CONFIG.dataSource,
       {
-        cache: "no-store"
+        cache: "no-store",
+        signal: AbortSignal.timeout(15000)
       }
     );
 
@@ -489,18 +490,18 @@ function formatRelativeDate(value) {
 
 function limpiarTexto(value) {
 
-  return String(
-    value || ""
-  )
-    .replace(
-      /https?:\/\/\S+/gi,
-      ""
+    return String(
+        value || ""
     )
-    .replace(
-      /\s+/g,
-      " "
-    )
-    .trim();
+        .replace(
+            /https?:\/\/\S+/gi,
+            ""
+        )
+        .replace(
+            /\s+/g,
+            " "
+        )
+        .trim();
 
 }
 

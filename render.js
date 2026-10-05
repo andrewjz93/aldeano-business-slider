@@ -91,7 +91,8 @@ export function createCompanyCard(
                 class="story-image"
                 src="${escapeAttribute(imagen)}"
                 alt="${escapeAttribute(titulo)}"
-                loading="lazy"
+                loading="eager"
+                decoding="async"
               >
             `
 
@@ -122,7 +123,8 @@ export function createCompanyCard(
                 class="story-logo"
                 src="${escapeAttribute(logo)}"
                 alt="Perfil de ${escapeAttribute(comunidad)}"
-                loading="lazy"
+                loading="eager"
+                decoding="async"
               >
             `
 

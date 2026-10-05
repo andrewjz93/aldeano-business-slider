@@ -33,7 +33,7 @@ function initializeSlider() {
         } else {
           const items = CONFIG.shuffleItems ? shuffleArray(companies) : companies;
           renderCompanies(track, items.length > 1 ? [...items, ...items] : items);
-          if (CONFIG.autoplay && items.length > 1) {
+          if (items.length > 1) {
             startSlider(track, viewport, items.length);
           }
         }

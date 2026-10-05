@@ -12,6 +12,30 @@ let currentViewport = null;
 let currentOriginalCount = 0;
 
 let resizeTimer = null;
+let navigationTimer = null;
+let loopDuration = 0;
+let stepDuration = 0;
+let animationGeneration = 0;
+
+function setNavigationEnabled(enabled) {
+  for (const id of ["sliderPrev", "sliderNext"]) {
+    const button = document.getElementById(id);
+    if (button) button.disabled = !enabled;
+  }
+}
+
+export function moveSlider(direction) {
+  if (!sliderAnimation || !loopDuration || !stepDuration) return;
+  pauseSlider();
+  const next = Number(sliderAnimation.currentTime || 0) + direction * stepDuration;
+  // El módulo positivo permite retroceder desde la primera tarjeta a la última.
+  sliderAnimation.currentTime = ((next % loopDuration) + loopDuration) % loopDuration;
+  clearTimeout(navigationTimer);
+  navigationTimer = setTimeout(() => {
+    navigationTimer = null;
+    resumeSlider();
+  }, 2500);
+}
 
 
 // =====================================================
@@ -25,6 +49,7 @@ export function startSlider(
 ) {
 
   stopSlider();
+  const generation = animationGeneration;
 
 
   if (
@@ -57,6 +82,7 @@ export function startSlider(
       requestAnimationFrame(
         () => {
 
+          if (generation !== animationGeneration) return;
           createAnimation(
             track,
             viewport,
@@ -77,6 +103,13 @@ export function startSlider(
 // =====================================================
 
 export function stopSlider() {
+  animationGeneration++;
+  clearTimeout(navigationTimer);
+  navigationTimer = null;
+  loopDuration = 0;
+  stepDuration = 0;
+  currentOriginalCount = 0;
+  setNavigationEnabled(false);
 
   if (
     sliderAnimation
@@ -113,6 +146,9 @@ export function pauseSlider() {
 // =====================================================
 
 export function resumeSlider() {
+  if (document.hidden || navigationTimer !== null ||
+      (CONFIG.pauseOnHover && currentViewport?.matches(":hover")) ||
+      (CONFIG.pauseOnFocus && currentViewport?.contains(document.activeElement))) return;
 
   if (
     sliderAnimation &&
@@ -261,6 +297,9 @@ function createAnimation(
   // ANIMACIÓN
   // ==================================================
 
+  loopDuration = duration;
+  const cardDistance = cards[1].offsetLeft - firstCard.offsetLeft;
+  stepDuration = (cardDistance / speed) * 1000;
   sliderAnimation =
     track.animate(
       [
@@ -291,7 +330,9 @@ function createAnimation(
   // ==================================================
 
   if (
-    !CONFIG.autoplay
+    !CONFIG.autoplay || document.hidden ||
+    (CONFIG.pauseOnHover && viewport.matches(":hover")) ||
+    (CONFIG.pauseOnFocus && viewport.contains(document.activeElement))
   ) {
 
     sliderAnimation.pause();
@@ -306,6 +347,7 @@ function createAnimation(
   configureInteractions(
     viewport
   );
+  setNavigationEnabled(true);
 
 
   // ==================================================
@@ -352,6 +394,8 @@ function configureInteractions(
 
   interactionsConfigured =
     true;
+  document.getElementById("sliderPrev")?.addEventListener("click", () => moveSlider(-1));
+  document.getElementById("sliderNext")?.addEventListener("click", () => moveSlider(1));
 
 
   // ==================================================
@@ -392,7 +436,7 @@ function configureInteractions(
 
     viewport.addEventListener(
       "focusout",
-      resumeSlider
+      () => queueMicrotask(resumeSlider)
     );
 
   }

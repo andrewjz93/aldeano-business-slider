@@ -514,3 +514,36 @@
 .story-company {
     display: none !important;
 }
+/* Navegación manual en los extremos del carrusel. */
+.slider-viewport { position: relative; }
+.slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 40;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(71,67,197,.2);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--primary);
+    box-shadow: 0 3px 14px rgba(0,0,0,.22);
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.slider-arrow-prev { left: 4px; }
+.slider-arrow-next { right: 4px; }
+.slider-arrow svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.slider-arrow:hover { background: #efeeff; }
+.slider-arrow:focus-visible { outline: 3px solid var(--primary); outline-offset: -4px; }
+.slider-arrow:disabled { opacity: .35; cursor: default; }
